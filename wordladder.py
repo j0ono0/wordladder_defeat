@@ -21,6 +21,7 @@ def loadvocab(filename):
         return pickle.load(f)
         
 solution = ['tooth','paste']
+
 index = 0
 vocab = {x for x in loadvocab('vocab.pickle') if len(x) == len(solution[0])}
 
@@ -36,4 +37,4 @@ while index < len(solution)-1:
         index += 1
     else:
         solution.insert(index+1, common_words.pop())
-        print(solution)
+print(solution)
