@@ -1,33 +1,42 @@
 import pickle
 import re
 
-class Wordset:
-    def __init__(self,seed):
+class Wordlib:
+    def __init__(self,filename):
+        self.full = self.load('vocab.pickle')
+        
+    def load(self,filename):
+        with open(filename,'rb') as f:
+            return pickle.load(f)        
+    
+    def len(self,length):
+        return {x for x in self.full if len(x) == length}
+            
+
+class Wordfamily:
+    def __init__(self,seed,vocab):
         self.seed = seed
         self.decendants = {seed}
+        self.vocab = vocab
     
     def extend(self):
         next_generation = set()
         for word in self.decendants:
             for i in range(len(word)):
                 patt = re.compile(word[:i]+'[a-z]'+word[i+1:])
-                matches = {x for x in vocab if patt.match(x)}
+                matches = {x for x in self.vocab if patt.match(x)}
                 next_generation |= matches
         self.decendants = next_generation
         return next_generation
 
-def loadvocab(filename):
-    with open(filename,'rb') as f:
-        return pickle.load(f)
-        
-solution = ['tooth','paste']
 
+vocab = Wordlib('vocab.pickle')
+solution = ['tooth','paste']
 index = 0
-vocab = {x for x in loadvocab('vocab.pickle') if len(x) == len(solution[0])}
 
 while index < len(solution)-1:
-    start = Wordset(solution[index])
-    end = Wordset(solution[index+1])
+    start = Wordfamily(solution[index],vocab.len(len(solution[0])))
+    end = Wordfamily(solution[index+1],vocab.len(len(solution[0])))
     while len(start.decendants & end.decendants) == 0:
         start.extend()
         if len(start.decendants & end.decendants) == 0:
